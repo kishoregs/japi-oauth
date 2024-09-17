@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 @Configuration
 @ConfigurationProperties(prefix = "spotify")
 public class SpotifyConfig {
+    //46ceb2e8d1d449ab9cfa64138c115946
     private static final Logger logger = LoggerFactory.getLogger(SpotifyConfig.class);
 
     private String clientId;
