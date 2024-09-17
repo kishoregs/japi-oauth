@@ -14,7 +14,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .csrf().disable()
             .authorizeRequests()
-                .antMatchers("/call-github-api", "/search-spotify").permitAll()
+                .antMatchers("/call-github-api", "/search-spotify", "/search-spotify-oauth2").permitAll()
                 .anyRequest().authenticated()
             .and()
             .httpBasic();

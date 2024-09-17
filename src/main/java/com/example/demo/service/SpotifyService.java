@@ -4,6 +4,8 @@ import com.example.demo.config.SpotifyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -19,10 +21,12 @@ public class SpotifyService {
 
     private final SpotifyConfig spotifyConfig;
     private final RestTemplate restTemplate;
+    private final OAuth2AuthorizedClientManager authorizedClientManager;
 
-    public SpotifyService(SpotifyConfig spotifyConfig, RestTemplate restTemplate) {
+    public SpotifyService(SpotifyConfig spotifyConfig, RestTemplate restTemplate, OAuth2AuthorizedClientManager authorizedClientManager) {
         this.spotifyConfig = spotifyConfig;
         this.restTemplate = restTemplate;
+        this.authorizedClientManager = authorizedClientManager;
         logger.debug("SpotifyService constructed with config: {}", spotifyConfig);
     }
 
@@ -98,6 +102,32 @@ public class SpotifyService {
                 entity,
                 String.class
         );
+    }
+
+    public ResponseEntity<String> searchTracksOAuth2(String query) {
+        logger.info("Searching Spotify tracks with OAuth2 and query: {}", query);
+
+        String accessToken = getAccessTokenOAuth2();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        return restTemplate.exchange(
+                "https://api.spotify.com/v1/search?q=" + query + "&type=track",
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+    }
+
+    private String getAccessTokenOAuth2() {
+        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("spotify")
+                .principal("spotifyClient")
+                .build();
+
+        return authorizedClientManager.authorize(authorizeRequest).getAccessToken().getTokenValue();
     }
 
     private static class SpotifyTokenResponse {

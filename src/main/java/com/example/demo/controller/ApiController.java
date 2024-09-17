@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.service.OAuthTokenService;
 import com.example.demo.service.SpotifyService;
+import com.example.demo.service.GitHubService;
 import com.example.demo.config.SpotifyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,13 @@ public class ApiController {
     private SpotifyService spotifyService;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private GitHubService gitHubService;
 
     @Autowired
     private SpotifyConfig spotifyConfig;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @GetMapping("/call-github-api")
     public ResponseEntity<String> callGithubApi() {
@@ -58,6 +62,17 @@ public class ApiController {
         }
     }
 
+    @GetMapping("/call-github-api-oauth2")
+    public ResponseEntity<String> callGithubApiOAuth2() {
+        logger.info("Entering callGithubApiOAuth2 method");
+        try {
+            return gitHubService.getUserReposOAuth2();
+        } catch (Exception e) {
+            logger.error("Error occurred while calling GitHub API with OAuth2", e);
+            return ResponseEntity.status(500).body("Error occurred: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/search-spotify")
     public ResponseEntity<String> searchSpotify(@RequestParam String query) {
         logger.info("Entering searchSpotify method with query: {}", query);
@@ -68,6 +83,18 @@ public class ApiController {
             return response;
         } catch (Exception e) {
             logger.error("Error occurred while calling Spotify API", e);
+            return ResponseEntity.status(500).body("Error occurred: " + e.getMessage() + ". Cause: " + e.getCause());
+        }
+    }
+
+    @GetMapping("/search-spotify-oauth2")
+    public ResponseEntity<String> searchSpotifyOAuth2(@RequestParam String query) {
+        logger.info("Entering searchSpotifyOAuth2 method with query: {}", query);
+        logger.debug("SpotifyConfig: {}", spotifyConfig);
+        try {
+            return spotifyService.searchTracksOAuth2(query);
+        } catch (Exception e) {
+            logger.error("Error occurred while calling Spotify API with OAuth2", e);
             return ResponseEntity.status(500).body("Error occurred: " + e.getMessage() + ". Cause: " + e.getCause());
         }
     }
