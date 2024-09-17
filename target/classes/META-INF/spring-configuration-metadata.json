@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "spotify",
+      "type": "com.example.demo.config.SpotifyConfig",
+      "sourceType": "com.example.demo.config.SpotifyConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "spotify.client-id",
+      "type": "java.lang.String",
+      "sourceType": "com.example.demo.config.SpotifyConfig"
+    },
+    {
+      "name": "spotify.client-secret",
+      "type": "java.lang.String",
+      "sourceType": "com.example.demo.config.SpotifyConfig"
+    }
+  ],
+  "hints": []
+}
