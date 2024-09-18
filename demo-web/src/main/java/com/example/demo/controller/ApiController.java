@@ -19,10 +19,13 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 public class ApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
+    private final OAuthTokenService oAuthTokenService;
 
-    @Autowired
-    private OAuthTokenService oAuthTokenService;
+    public ApiController(OAuthTokenService oAuthTokenService) {
+        this.oAuthTokenService = oAuthTokenService;
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
     @Autowired
     private SpotifyService spotifyService;
@@ -36,7 +39,7 @@ public class ApiController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @GetMapping("/call-github-api")
+    @GetMapping("/api/call-github-api")
     public ResponseEntity<String> callGithubApi() {
         logger.info("Entering callGithubApi method");
         try {
@@ -62,7 +65,7 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/call-github-api-oauth2")
+    @GetMapping("/api/call-github-api-oauth2")
     public ResponseEntity<String> callGithubApiOAuth2() {
         logger.info("Entering callGithubApiOAuth2 method");
         try {
@@ -73,7 +76,7 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/search-spotify")
+    @GetMapping("/api/search-spotify")
     public ResponseEntity<String> searchSpotify(@RequestParam String query) {
         logger.info("Entering searchSpotify method with query: {}", query);
         logger.debug("SpotifyConfig: {}", spotifyConfig);
@@ -87,7 +90,7 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/search-spotify-oauth2")
+    @GetMapping("/api/search-spotify-oauth2")
     public ResponseEntity<String> searchSpotifyOAuth2(@RequestParam String query) {
         logger.info("Entering searchSpotifyOAuth2 method with query: {}", query);
         logger.debug("SpotifyConfig: {}", spotifyConfig);

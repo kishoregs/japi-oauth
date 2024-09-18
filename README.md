@@ -1,6 +1,8 @@
 # japi-oauth
 
+To run the application locally:
 
+```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 
 mvn clean package
@@ -31,5 +33,23 @@ With these changes:
 ```bash
 local development: mvn spring-boot:run -Dspring-boot.run.profiles=local
 WebSphere deployment: mvn clean package -Pwebsphere
+
+
+mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 This setup ensures that the application can run both locally with the embedded server and on WebSphere with the appropriate configurations.
+
+
+mvn clean install
+cd demo-web
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+
+
+http://localhost:8092/api/search-spotify?query=beatles
+http://localhost:8092/api/search-spotify-oauth2?query=beatles
+
+
+http://localhost:8092/api/call-github-api
+http://localhost:8092/api/call-github-api-oauth2 [doesn't work due to credentials]
+
+http://localhost:8092/api/dummy
