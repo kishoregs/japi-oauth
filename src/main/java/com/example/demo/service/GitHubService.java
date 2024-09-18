@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -40,10 +43,18 @@ public class GitHubService {
     }
 
     private String getAccessTokenOAuth2() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("github")
-                .principal("githubClient")
+                .principal(authentication)
                 .build();
 
-        return authorizedClientManager.authorize(authorizeRequest).getAccessToken().getTokenValue();
+        OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
+        
+        if (authorizedClient != null) {
+            return authorizedClient.getAccessToken().getTokenValue();
+        }
+        
+        return null;
     }
 }

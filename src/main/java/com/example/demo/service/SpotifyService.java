@@ -5,7 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -123,29 +126,18 @@ public class SpotifyService {
     }
 
     private String getAccessTokenOAuth2() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("spotify")
-                .principal("spotifyClient")
+                .principal(authentication)
                 .build();
 
-        return authorizedClientManager.authorize(authorizeRequest).getAccessToken().getTokenValue();
-    }
-
-    private static class SpotifyTokenResponse {
-        private String access_token;
-
-        public String getAccessToken() {
-            return access_token;
+        OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
+        
+        if (authorizedClient != null) {
+            return authorizedClient.getAccessToken().getTokenValue();
         }
-
-        public void setAccessToken(String access_token) {
-            this.access_token = access_token;
-        }
-
-        @Override
-        public String toString() {
-            return "SpotifyTokenResponse{" +
-                    "access_token='" + (access_token != null ? access_token.substring(0, 5) + "..." : "null") + '\'' +
-                    '}';
-        }
+        
+        return null;
     }
 }
