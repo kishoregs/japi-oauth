@@ -53,3 +53,11 @@ http://localhost:8092/api/call-github-api
 http://localhost:8092/api/call-github-api-oauth2 [doesn't work due to credentials]
 
 http://localhost:8092/api/dummy
+
+
+
+
+source ~/.bashrc  # or ~/.bash_profile or ~/.zshrc
+
+
+echo -e "\nexport M2_HOME=/Users/kishoreshiraguppi/java/apache-maven-3.9.3/bin/\nexport PATH=\$PATH:\$M2_HOME" >> ~/.bashrc
