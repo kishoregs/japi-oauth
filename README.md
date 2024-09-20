@@ -30,13 +30,15 @@ Add a new application-websphere.properties:
 4. Update the pom.xml to include a WebSphere profile:
 With these changes:
 
-```bash
-local development: mvn spring-boot:run -Dspring-boot.run.profiles=local
-WebSphere deployment: mvn clean package -Pwebsphere
 
-
+local development: 
 mvn spring-boot:run -Dspring-boot.run.profiles=local
-```
+WebSphere deployment:
+ mvn clean package -Pwebsphere
+
+
+
+
 This setup ensures that the application can run both locally with the embedded server and on WebSphere with the appropriate configurations.
 
 
