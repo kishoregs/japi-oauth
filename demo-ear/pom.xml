@@ -43,6 +43,16 @@
                         </webModule>
                     </modules>
                 </configuration>
+                <executions>
+                    <execution>
+                      <?m2e execute onConfiguration?>
+                        <id>default-generate-application-xml</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate-application-xml</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
