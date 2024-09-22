@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
 import java.util.Base64;
@@ -139,5 +140,21 @@ public class SpotifyService {
         }
         
         return null;
+    }
+
+    public ResponseEntity<String> searchItems(String query, String type, int limit, int offset) {
+        String url = UriComponentsBuilder.fromHttpUrl("https://api.spotify.com/v1/search")
+                .queryParam("q", query)
+                .queryParam("type", type)
+                .queryParam("limit", limit)
+                .queryParam("offset", offset)
+                .build()
+                .toUriString();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(this.getAccessToken());
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        return restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
     }
 }

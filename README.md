@@ -63,3 +63,5 @@ source ~/.bashrc  # or ~/.bash_profile or ~/.zshrc
 
 
 echo -e "\nexport M2_HOME=/Users/kishoreshiraguppi/java/apache-maven-3.9.3/bin/\nexport PATH=\$PATH:\$M2_HOME" >> ~/.bashrc
+
+source ~/.bashrc

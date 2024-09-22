@@ -14,12 +14,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import java.util.List;
+import java.util.Arrays;
 
 @RestController
 public class ApiController {
 
-    private final OAuthTokenService oAuthTokenService;
+    @Autowired
+    private OAuthTokenService oAuthTokenService;
 
     public ApiController(OAuthTokenService oAuthTokenService) {
         this.oAuthTokenService = oAuthTokenService;
@@ -77,16 +82,44 @@ public class ApiController {
     }
 
     @GetMapping("/api/search-spotify")
-    public ResponseEntity<String> searchSpotify(@RequestParam String query) {
-        logger.info("Entering searchSpotify method with query: {}", query);
+    public ResponseEntity<?> searchSpotify(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "track") String type,
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
+        logger.info("Entering searchSpotify method with query: {}, type: {}, limit: {}, offset: {}", query, type, limit, offset);
         logger.debug("SpotifyConfig: {}", spotifyConfig);
+
+        if (query == null || query.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Query parameter cannot be empty");
+        }
+
+        if (limit < 1 || limit > 50) {
+            return ResponseEntity.badRequest().body("Limit must be between 1 and 50");
+        }
+
+        if (offset < 0) {
+            return ResponseEntity.badRequest().body("Offset must be non-negative");
+        }
+
+        List<String> validTypes = Arrays.asList("album", "artist", "playlist", "track", "show", "episode");
+        if (!validTypes.contains(type)) {
+            return ResponseEntity.badRequest().body("Invalid type. Must be one of: " + String.join(", ", validTypes));
+        }
+
         try {
-            ResponseEntity<String> response = spotifyService.searchTracks(query);
-            logger.info("Spotify API call completed");
+            ResponseEntity<String> response = spotifyService.searchItems(query, type, limit, offset);
+            logger.info("Spotify API call completed successfully");
             return response;
+        } catch (HttpClientErrorException e) {
+            logger.error("Client error occurred while calling Spotify API", e);
+            return ResponseEntity.status(e.getStatusCode()).body("Spotify API error: " + e.getResponseBodyAsString());
+        } catch (HttpServerErrorException e) {
+            logger.error("Server error occurred while calling Spotify API", e);
+            return ResponseEntity.status(500).body("Spotify server error. Please try again later.");
         } catch (Exception e) {
-            logger.error("Error occurred while calling Spotify API", e);
-            return ResponseEntity.status(500).body("Error occurred: " + e.getMessage() + ". Cause: " + e.getCause());
+            logger.error("Unexpected error occurred while calling Spotify API", e);
+            return ResponseEntity.status(500).body("An unexpected error occurred: " + e.getMessage());
         }
     }
 
