@@ -1,0 +1,1 @@
+alias save='git add . && git commit -m "log4j2" && git push'
