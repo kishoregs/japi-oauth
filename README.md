@@ -65,3 +65,51 @@ source ~/.bashrc  # or ~/.bash_profile or ~/.zshrc
 echo -e "\nexport M2_HOME=/Users/kishoreshiraguppi/java/apache-maven-3.9.3/bin/\nexport PATH=\$PATH:\$M2_HOME" >> ~/.bashrc
 
 source ~/.bashrc
+
+async function measurePostApiCallTime(url, data = {}) {
+  console.log(`Calling API: ${url}`);
+  
+  const start = performance.now();
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    
+    const responseData = await response.json();
+    
+    const end = performance.now();
+    const timeTaken = end - start;
+    
+    console.log(`API call completed in ${timeTaken.toFixed(2)} milliseconds`);
+    console.log('Response status:', response.status);
+    console.log('Response data:', responseData);
+    
+    return { timeTaken, responseData, status: response.status };
+  } catch (error) {
+    console.error('Error calling API:', error);
+    throw error;
+  }
+}
+
+// Usage example
+const apiUrl = 'https://api.example.com/endpoint';
+const postData = {
+  key1: 'value1',
+  key2: 'value2'
+};
+
+measurePostApiCallTime(apiUrl, postData)
+  .then(result => {
+    console.log('Measurement complete');
+    console.log(`Time taken: ${result.timeTaken.toFixed(2)} ms`);
+    console.log(`Status: ${result.status}`);
+    console.log('Response data:', result.responseData);
+  })
+  .catch(error => {
+    console.error('Measurement failed:', error);
+  });
