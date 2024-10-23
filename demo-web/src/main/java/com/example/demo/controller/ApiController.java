@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.ErrorResponseDTO;
+import com.example.demo.service.ExternalApiService;
 import com.example.demo.service.OAuthTokenService;
 import com.example.demo.service.SpotifyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -60,6 +62,20 @@ public class ApiController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private ExternalApiService externalApiService;
+
+    @GetMapping("/external-data")
+    public ResponseEntity<?> getExternalData() {
+        try {
+            return externalApiService.callExternalApi("https://api.example.com/data");
+        } catch (ExternalApiService.ApiException e) {
+            return ResponseEntity
+                    .status(e.getStatus())
+                    .body(new ErrorResponseDTO(e.getMessage()));
+        }
+    }
 
     @GetMapping("/api/call-github-api")
     public ResponseEntity<String> callGithubApi() {
